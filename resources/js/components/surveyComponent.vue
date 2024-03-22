@@ -1,105 +1,170 @@
 <!-- MyComponent.vue -->
 <template>
-    <div v-if="siguientePaso == false && pantallaGracias == false && encuestaLarga == false"> 
-      <h3 class="titulo">Encuesta de evaluación de la calidad de los servicios</h3>
-      <p class="subtitulo">Seleccione el emplazamiento y unidad o servicio a evaluar para comenzar</p>
-      <div class="contenedor-centralizado">
-        <div class="selector">
-          <label style="font-weight: bold; font-size: 20px;" for="campus">Campus/Sede: </label>
-          <br>
-          <select class="form-select" v-model="encuesta.campus" id="campus" @change="getUnidades()">
-            <option disabled value="">Seleccione una opción</option>
-            <option v-for="sede in sedes" v-bind:key="sede.id" v-bind:value="sede">
-                {{ sede.sede }}
-            </option>
-          </select>
-        </div>
-        <div class="selector">
-          <label style="font-weight: bold; font-size: 20px;" for="unidad">Unidad o Servicio: </label>
-          <br>
-          <select class="form-select" v-model="encuesta.unidad" id="unidad" @change="getSubunidades()">
-            <option disabled value="">Seleccione una opción</option>
-            <option v-for="unidad in unidades.unidades" v-bind:key="unidad.id" v-bind:value="unidad">
-                {{ unidad.name }}
-            </option>
-          </select>
-        </div>
-        <div v-if="encuesta.unidad.subunidades" class="selector">
-          <label style="font-weight: bold; font-size: 20px;" for="subunidad">Subunidad: </label>
-          <br>
-          <select class="form-select" v-model="encuesta.subunidad" id="subunidad">
-            <option disabled value="">Seleccione una opción</option>
-            <option v-for="subunidad in subunidades.subunidades" v-bind:key="subunidad.id" v-bind:value="subunidad.id">
-                {{ subunidad.name }}
-            </option>
-          </select>
-        </div>
-    </div>
-    <button class="boton-azul float-end" @click="handleClick">Comenzar</button>
-    <br>
-    </div>
-    <div v-else-if="siguientePaso == true"> 
-      <h3 class="titulo">Encuesta de evaluación de la calidad de los servicios</h3>
-      <p class="subtitulo">Califique la unidad o servicio seleccionado</p>
-      <div class="contenedor-centralizado">
-        <div class="row">
-          <div class="contenedor-centralizado d-flex flex-column">
-            <div class="chart-scale">
-              <button class="btn btn-scale btn-scale-desc-1" @click="longSurvey">1</button>
-              <button class="btn btn-scale btn-scale-desc-2" @click="longSurvey">2</button>
-              <button class="btn btn-scale btn-scale-desc-3" @click="longSurvey">3</button>
-              <button class="btn btn-scale btn-scale-desc-4" @click="longSurvey">4</button>
-              <button class="btn btn-scale btn-scale-desc-5" @click="handleClick2">5</button>
-              <button class="btn btn-scale btn-scale-desc-6" @click="handleClick2">6</button>
-              <button class="btn btn-scale btn-scale-desc-7" @click="handleClick2">7</button>
-            </div>
+    <div v-if="siguientePaso == false"> 
+      <h3 class="titulo">Encuesta de evaluación de calidad </h3>
+      <div class="row" v-if="isMobile">
+        <!-- Primer grupo -->
+        <div class="col-md-4" v-show="group === 1">
+          <p class="subtitulo">CAMPUS/SEDE</p>
+          <div class="botones-container">
+            <button class="boton-naranja" @click="seleccionarSede('Valparaíso')" :class="{ 'seleccionado': encuesta.campus === 'Valparaíso' }">Valparaíso</button>
+            <button class="boton-naranja" @click="seleccionarSede('San Joaquín')" :class="{ 'seleccionado': encuesta.campus === 'San Joaquín' }">San Joaquín</button>
+            <button class="boton-naranja" @click="seleccionarSede('Vitacura')" :class="{ 'seleccionado': encuesta.campus === 'Vitacura' }">Vitacura</button>
+            <button class="boton-naranja" @click="seleccionarSede('Viña del Mar')" :class="{ 'seleccionado': encuesta.campus === 'Viña del Mar' }">Viña del Mar</button>
+            <button class="boton-naranja" @click="seleccionarSede('Concepción')" :class="{ 'seleccionado': encuesta.campus === 'Concepción' }">Concepción</button>
           </div>
         </div>
-    </div>
-    <button class="boton-azul2" @click="siguientePaso = false">Volver</button>
-    <br>
-    </div>
-    <div v-else-if="pantallaGracias == true"> 
-      <h3 class="titulo">Encuesta de evaluación de la calidad de los servicios</h3>
-      <p class="subtitulo">
-      ¡Gracias por tu valiosa opinión!
-      Si deseas evaluar otro servicio, simplemente haz clic en el botón a continuación.</p>
-      <div class="contenedor-centralizado">
-        <button class="boton-azul2" @click="siguientePaso = false, pantallaGracias = false, encuestaLarga = false, encuesta.campus = '', encuesta.unidad = ''">Evaluar otro servicio</button>
+        <!-- Segundo grupo -->
+        <div class="col-md-4 " v-show="group === 2">
+          <p class="subtitulo">SERVICIOS</p>
+          <div class="botones-container">
+            <button class="boton-naranja" @click="seleccionarServicio('Baños')" :class="{ 'seleccionado': encuesta.unidad === 'Baños' }">Baños</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Comedor')" :class="{ 'seleccionado': encuesta.unidad === 'Comedor' }">Comedor</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Cajas')" :class="{ 'seleccionado': encuesta.unidad === 'Cajas' }">Cajas</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Biblioteca')" :class="{ 'seleccionado': encuesta.unidad === 'Biblioteca' }">Biblioteca</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Gimnasios')" :class="{ 'seleccionado': encuesta.unidad === 'Gimnasios' }">Gimnasios</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Laboratorio computacion')" :class="{ 'seleccionado': encuesta.unidad === 'Laboratorio computacion' }">Laboratorio computacion</button>
+          </div>
+        </div>
+        <!-- Tercer grupo -->
+        <div class="col-md-4 " v-show="group === 3">
+          <p class="subtitulo">SUBSERVICIOS</p>
+          <div class="botones-container">
+            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio I')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio I' }">Gimnasio Edificio I</button>
+            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio II')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio II' }">Gimnasio Edificio II</button>
+            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio III')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio III' }">Gimnasio Edificio III</button>
+          </div>
+        </div>
+        <button v-if="group != 1" class="boton-azul2" @click="group = group - 1">Volver</button>
+      </div>
+      <div class="row" v-else>
+        <!-- Primer grupo -->
+        <div class="col-md-4">
+          <h2 class="subtitulo">Campus/Sede</h2>
+          <div class="botones-container">
+            <button class="boton-naranja" @click="seleccionarSede('Valparaíso')" :class="{ 'seleccionado': encuesta.campus === 'Valparaíso' }">Valparaíso</button>
+            <button class="boton-naranja" @click="seleccionarSede('San Joaquín')" :class="{ 'seleccionado': encuesta.campus === 'San Joaquín' }">San Joaquín</button>
+            <button class="boton-naranja" @click="seleccionarSede('Vitacura')" :class="{ 'seleccionado': encuesta.campus === 'Vitacura' }">Vitacura</button>
+            <button class="boton-naranja" @click="seleccionarSede('Viña del Mar')" :class="{ 'seleccionado': encuesta.campus === 'Viña del Mar' }">Viña del Mar</button>
+            <button class="boton-naranja" @click="seleccionarSede('Concepción')" :class="{ 'seleccionado': encuesta.campus === 'Concepción' }">Concepción</button>
+          </div>
+        </div>
+        <!-- Segundo grupo -->
+        <div class="col-md-4">
+          <h2 class="subtitulo">Servicios</h2>
+          <div class="botones-container">
+            <button class="boton-naranja" @click="seleccionarServicio('Baños')" :class="{ 'seleccionado': encuesta.unidad === 'Baños' }">Baños</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Comedor')" :class="{ 'seleccionado': encuesta.unidad === 'Comedor' }">Comedor</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Cajas')" :class="{ 'seleccionado': encuesta.unidad === 'Cajas' }">Cajas</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Biblioteca')" :class="{ 'seleccionado': encuesta.unidad === 'Biblioteca' }">Biblioteca</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Gimnasios')" :class="{ 'seleccionado': encuesta.unidad === 'Gimnasios' }">Gimnasios</button>
+            <button class="boton-naranja" @click="seleccionarServicio('Laboratorio computacion')" :class="{ 'seleccionado': encuesta.unidad === 'Laboratorio computacion' }">Laboratorio computacion</button>
+          </div>
+        </div>
+        <!-- Tercer grupo -->
+        <div class="col-md-4 ">
+          <h2 class="subtitulo">Subservicios</h2>
+          <div class="botones-container">
+            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio I')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio I' }">Gimnasio Edificio I</button>
+            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio II')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio II' }">Gimnasio Edificio II</button>
+            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio III')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio III' }">Gimnasio Edificio III</button>
+          </div>
+        </div>
       </div>
     <br>
     </div>
-    <div v-else-if="encuestaLarga == true"> 
-      <h3 class="titulo">Encuesta de evaluación de la calidad de los servicios </h3>
-      <br>
-      <div class="contenedor-centralizado">
-        <div v-for="pregunta in preguntas" :key="pregunta.id">
-          <div v-if="pregunta.tipo === 'Opciones'">
-            <h4>{{ pregunta.pregunta }}</h4>
-            <div class="form-check" v-for="opcion in pregunta.opciones" :key="opcion.id">
-              <input class="form-check-input" type="checkbox" :id="'opcion_' + opcion.id" v-model="opcion.seleccionado" @change="limitarSeleccion">
-              <label class="form-check-label" :for="'opcion_' + opcion.id">{{ opcion.opcion }}</label>
+    <div class="modal" v-if="showModal" >
+      <div class="modal-contenido">
+        <div class="modal-cuerpo">
+          <div class="row">
+            <h2 class="subtitulo2 pt-4">¿Cómo evalúas tu experiencia?</h2>
+            <div class="boton-estrella-container">
+              <div
+                class="boton-estrella"
+                v-for="i in 5"
+                :key="i"
+                @mouseover="hoverStar(i)"
+                @mouseleave="leaveStar(i)"
+              >
+                <button
+                  class="boton-icono"
+                  @click="onClick(i)"
+                  :class="{ 'seleccionado': i <= valorSeleccionado, 'hover': i === estrellaHover }"
+                >
+                  <i class="fas fa-star"></i> <!-- Icono de Font Awesome -->
+                  <span class="numero">{{ i }}</span> <!-- Número dentro del botón -->
+                  <!-- Opcional: Texto para accesibilidad -->
+                  <span class="sr-only">Seleccionar</span>
+                </button>
+              </div>
             </div>
-            <br>
-          </div>
-          <div v-else-if="pregunta.tipo === 'Texto'">
-            <div class="form-group">
-              <label :for="'texto_' + pregunta.id">{{ pregunta.pregunta }}</label>
-              <textarea class="form-control" :id="'texto_' + pregunta.id" rows="3"></textarea>
+            <div class="contenedor-centralizado pt-4">
+              <button class="boton-azul" @click="showModal = false">Volver</button>
+              &nbsp;
+              <button class="boton-azul float-end" @click="handleClick2">Enviar Feedback</button>
             </div>
-            <br>
           </div>
         </div>
       </div>
-      <button class="boton-azul2" @click="siguientePaso = true,encuestaLarga = false">Volver</button>
-      <button class="boton-azul float-end" @click="handleClick2">Enviar</button>
-    <br>
+    </div>
+    <div class="modal" v-if="pantallaGracias" >
+      <div class="modal-contenido2">
+        <div class="modal-cuerpo">
+          <div class="row">
+            <div class="contenedor-centralizado pt-5">
+              <img src="https://cdn-icons-png.flaticon.com/512/8279/8279756.png" alt="Imagen del círculo" style="width: 200px;">
+            </div>
+            <p class="subtitulo2">¡Muchas Gracias! <br>Eres parte importante del cambio</p>
+            <div class="contenedor-centralizado">
+              <button class="boton-azul" @click="startAgain()">Evaluar otro servicio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" v-if="encuestaLarga" >
+      <div class="modal-contenido3">
+        <div class="modal-cuerpo">
+          <div class="row">
+            <div class="col-md-12 ">
+              <h2 class="subtitulo2">¿Cómo evalúas tu experiencia?</h2>
+              <div class="contenedor-centralizado">
+                <div v-for="pregunta in preguntas" :key="pregunta.id">
+                  <div v-if="pregunta.tipo === 'Opciones'">
+                    <h4>{{ pregunta.pregunta }}</h4>
+                    <div class="form-check" v-for="opcion in pregunta.opciones" :key="opcion.id">
+                      <input class="form-check-input" type="checkbox" :id="'opcion_' + opcion.id" v-model="opcion.seleccionado" @change="limitarSeleccion">
+                      <label class="form-check-label" :for="'opcion_' + opcion.id">{{ opcion.opcion }}</label>
+                    </div>
+                    <br>
+                  </div>
+                  <div v-else-if="pregunta.tipo === 'Texto'">
+                    <div class="form-group">
+                      <label :for="'texto_' + pregunta.id">{{ pregunta.pregunta }}</label>
+                      <textarea class="form-control" :id="'texto_' + pregunta.id" rows="3"></textarea>
+                    </div>
+                    <br>
+                  </div>
+                </div>
+                
+                <div class="contenedor-centralizado">
+                  <button class="boton-azul2" @click="showModal = true,encuestaLarga = false">Volver</button>
+                  &nbsp;
+                  <button class="boton-azul2 float-end" @click="handleClick2">Enviar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </template>
   
   <script>
   import axios from 'axios'
+
   import {mixin} from '../mixins.js'
+  
   export default {
     mixins: [mixin],
     data: () => ({
@@ -108,6 +173,8 @@
         unidad: '',
         subunidad: '',
       },
+      isMobile: false,
+      group: 1,
       errors: [],
       sedes: [],
       unidades: [],
@@ -117,7 +184,9 @@
       encuestaLarga: false,
       siguientePaso: false,
       pantallaGracias: false,
-
+      valorSeleccionado: 0, 
+      estrellaHover: null,
+      showModal: false,
       preguntas: [
         {
           "grupo": "Negativa",
@@ -163,7 +232,78 @@
       }
       
     },
+    mounted() {
+      this.isMobile = window.innerWidth <= 576;
+      window.addEventListener('resize', this.checkMobile);
+      // Escuchar el evento keydown en el documento
+      document.addEventListener('keydown', this.cerrarModalConEscape);
+    },
+    beforeDestroy() {
+      window.removeEventListener('resize', this.checkMobile);
+      // Eliminar el evento keydown del documento al destruir el componente
+      document.removeEventListener('keydown', this.cerrarModalConEscape);
+    },
     methods: {
+        startAgain(){
+          if(this.isMobile){
+            this.group = 1;
+          };
+          this.valorSeleccionado = 0; 
+          this.siguientePaso = false;
+          this.pantallaGracias = false;
+          this.encuestaLarga = false; 
+          this.encuesta.campus = '';
+          this.encuesta.unidad = ''; 
+          this.encuesta.subunidad = '';
+        },
+        checkMobile() {
+          this.isMobile = window.innerWidth <= 576;
+        },
+        cerrarModalConEscape(evento) {
+          // Verificar si la tecla presionada es la tecla "Escape"
+          if (evento.keyCode === 27) {
+            // Lógica para cerrar el modal aquí
+            this.showModal = false;
+            this.pantallaGracias = false;
+            this.encuestaLarga = false;
+          }
+        },
+        onClick(valor) {
+          // Función para manejar el clic en el botón
+          this.valorSeleccionado = valor;
+        },
+        hoverStar(valor) {
+          // Función para manejar el hover sobre la estrella
+          this.estrellaHover = valor;
+        },
+        leaveStar() {
+          // Función para manejar el hover fuera de la estrella
+          this.estrellaHover = null;
+        },
+        seleccionarServicio(servicio) {
+          this.encuesta.unidad = servicio;
+          if(this.isMobile){
+            this.group = 3;
+          }
+          if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
+            this.showModal = true;
+          }
+        },
+        seleccionarSubservicio(subservicio) {
+          this.encuesta.subunidad = subservicio;
+          if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
+            this.showModal = true;
+          }
+        },
+        seleccionarSede(sede) {
+          this.encuesta.campus = sede;
+          if(this.isMobile){
+            this.group = 2;
+          }
+          if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
+            this.showModal = true;
+          }
+        },
         limitarSeleccion() {
           // Limita la selección a un máximo de 2 checkboxes
           const opcionesSeleccionadas = this.preguntas[1].opciones.filter(opcion => opcion.seleccionado);
@@ -207,6 +347,7 @@
         },
         getSedes() {
           const tokenValue = this.token.token;
+          console.log(tokenValue);
           // Configuración de los encabezados con el token
           const headers = {
             authorization: `${tokenValue}`
@@ -310,8 +451,12 @@
             }
         },
         handleClick2(){
-          this.siguientePaso = false;
-          this.pantallaGracias = true;
+          this.showModal = false;
+          if(this.valorSeleccionado < 5){
+            this.encuestaLarga = true;
+          }else{
+            this.pantallaGracias = true;
+          }
         },
         longSurvey(){
           this.siguientePaso = false;
@@ -352,6 +497,77 @@
   </script>
   
   <style scoped>
+      .textarea-container {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        font-size: 16px;
+        resize: none; /* Permite redimensionar verticalmente el textarea */
+        box-sizing: border-box; /* El tamaño incluye el borde y el padding */
+      }
+
+      .boton-estrella-container {
+        display: flex; /* Mostrar los botones en una fila */
+        justify-content: center; /* Centrar horizontalmente los botones */
+      }
+
+      .boton-estrella {
+        margin-right: 10px; /* Espacio entre los botones */
+      }
+
+      .boton-icono {
+        position: relative;
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        font-size: 0;
+        cursor: pointer;
+      }
+
+      .boton-icono .numero {
+        position: absolute;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      /* Estilos para el icono */
+      .boton-icono i {
+        font-size: 50px;
+        color: #ccc; /* Color gris para las estrellas */
+      }
+
+      /* Estilo para cuando se posiciona el ratón */
+      .boton-icono.hover i, .boton-icono.hover~.boton-icono i {
+        color: #F4C06A; /* Color naranja para las estrellas cuando se pasa el ratón */
+      }
+
+      /* Estilo para las estrellas seleccionadas */
+      .boton-icono.seleccionado i, .boton-icono.seleccionado~.boton-icono i {
+        color: #F4C06A; /* Color naranja para las estrellas seleccionadas */
+      }
+
+      /* Estilos opcionales para accesibilidad */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
       /* Estilos generales para el form-select */
       .form-select {
         width: 300px;
@@ -394,51 +610,30 @@
         }
     }
 
-    .btn-scale-desc-1 {
-      background-color: #FF0000;
-    }
-
-    .btn-scale-desc-2 {
-      background-color: #FF3300;
-    }
-
-    .btn-scale-desc-3 {
-      background-color: #FF6600;
-    }
-
-    .btn-scale-desc-4 {
-      background-color: #FF9900;
-    }
-
-    .btn-scale-desc-5 {
-      background-color: #FFFF00;
-    }
-
-    .btn-scale-desc-6 {
-      background-color: #CCFF00;
-    }
-
-    .btn-scale-desc-7 {
-      background-color: #33FF00;
-    }
-
-    .btn-scale-desc-1:hover { background-color: #DE0000; }
-    .btn-scale-desc-2:hover { background-color: #DE2C00; }
-    .btn-scale-desc-3:hover { background-color: #DE5900; }
-    .btn-scale-desc-4:hover { background-color: #DE8500; }
-    .btn-scale-desc-5:hover { background-color: #DEB100; }
-    .btn-scale-desc-6:hover { background-color: #DEDE00; }
-    .btn-scale-desc-7:hover { background-color: #2CDE00; }
     .titulo {
       text-align: center;
       font-weight: bold;
       font-size: 40px;
+      color: #24006A;
+      padding-bottom: 40px;
     }
     
     .subtitulo {
       padding-top: 20px;
+      padding-bottom: 10px;
       text-align: center;
-      font-size: 30px;
+      font-size: 22px;
+      font-weight: bolder;
+      color: #24006A;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .subtitulo2 {
+      padding-bottom: 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bolder;
+      color: #24006A;
       font-family: 'Montserrat', sans-serif;
     }
 
@@ -465,10 +660,64 @@
       margin: 20px;
       margin-bottom: 30px;
     }
+
+    .boton-naranja {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: lighter;
+      background-color: #fff; /* Fondo blanco */
+      color: #000; /* Texto negro */
+      min-width: 100%;
+      min-height: 100px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 20px; /* Bordes redondeados */
+      margin-bottom: 20px;
+      border: none; /* Quita el borde */
+    }
+
+    .boton-naranja:hover{
+      background-color: #F4C06A; /* Fondo naranja al pasar el mouse o enfocar */
+      color: #fff; /* Texto blanco */
+    }
+
+    .boton-naranja.seleccionado {
+      background-color: #F4C06A; /* Estilo para el botón seleccionado */
+      color: #fff; /* Texto blanco */
+    }
+    
+
+    .botones-container {
+      max-height: 600px; /* Altura máxima del contenedor */
+      padding-right: 10px;
+      padding-left: 10px;
+      overflow-y: auto; /* Agrega desplazamiento vertical cuando los botones exceden la altura máxima */
+    }
+
+
+
+      /* Estilo para hacer la barra de desplazamiento más pequeña */
+      .botones-container::-webkit-scrollbar {
+          width: 5px; /* Ancho de la barra de desplazamiento */
+      }
+
+      /* Estilo para el riel de la barra de desplazamiento */
+      .botones-container::-webkit-scrollbar-track {
+          background-color: #f1f1f1; /* Color de fondo del riel de la barra de desplazamiento */
+      }
+
+      /* Estilo para el pulgar de la barra de desplazamiento */
+      .botones-container::-webkit-scrollbar-thumb {
+          background-color: #888; /* Color del pulgar de la barra de desplazamiento */
+          border-radius: 5px; /* Borde redondeado del pulgar */
+      }
+
     .boton-azul {
       font-family: 'Montserrat', sans-serif;
       font-weight: bold;
-      background-color: #005D8E; /* Color azul */
+      background-color: #495A66; /* Color azul */
       color: #fff; /* Texto blanco */
       border: none;
       padding: 10px 40px; /* Ajusta el relleno según sea necesario */
@@ -477,8 +726,7 @@
       display: inline-block;
       font-size: 16px;
       cursor: pointer;
-      border-radius: 10px; /* Bordes redondeados */
-      margin-bottom: 20px;
+      border-radius: 20px; /* Bordes redondeados */
       }
 
       .boton-azul2 {
@@ -494,6 +742,87 @@
         font-size: 16px;
         cursor: pointer;
         border-radius: 10px; /* Bordes redondeados */
+      }
+
+      /* MODAAAAL */
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-contenido {
+        background-color: #fff;
+        border-radius: 90px;
+        padding: 20px;
+        width: 600px;
+        height: 300px;
+      }
+
+      .modal-contenido2 {
+        background-color: #fff;
+        border-radius: 90px;
+        padding: 20px;
+        width: 500px;
+        height: 450px;
+      }
+
+      .modal-contenido3 {
+        background-color: #fff;
+        border-radius: 90px;
+        overflow-y: auto;
+        padding: 40px;
+        width: 500px;
+        max-height: 80vh;
+      }
+
+      /* Estilo para ocultar la barra de desplazamiento pero aún permitir el desplazamiento */
+      .modal-contenido3::-webkit-scrollbar {
+          display: none; /* Oculta la barra de desplazamiento en navegadores webkit */
+      }
+
+      /* Estilo para hacer la barra de desplazamiento más pequeña */
+      .modal-contenido3::-webkit-scrollbar {
+          width: 5px; /* Ancho de la barra de desplazamiento */
+      }
+
+      /* Estilo para el riel de la barra de desplazamiento */
+      .modal-contenido3::-webkit-scrollbar-track {
+          background-color: #f1f1f1; /* Color de fondo del riel de la barra de desplazamiento */
+      }
+
+      /* Estilo para el pulgar de la barra de desplazamiento */
+      .modal-contenido3::-webkit-scrollbar-thumb {
+          background-color: #888; /* Color del pulgar de la barra de desplazamiento */
+          border-radius: 5px; /* Borde redondeado del pulgar */
+      }
+      
+      .imagen-circulo {
+        position: absolute; /* Posicionar la imagen sobre el header */
+        top: 30%; /* Ajustar la posición para que sobresalga por arriba */
+        left: 50%; /* Centrar horizontalmente */
+        transform: translateX(-50%); /* Centrar horizontalmente */
+      }
+
+      .imagen-circulo2 {
+        position: absolute; /* Posicionar la imagen sobre el header */
+        top: 30%; /* Ajustar la posición para que sobresalga por arriba */
+        left: 50%; /* Centrar horizontalmente */
+        transform: translateX(-50%); /* Centrar horizontalmente */
+      }
+
+      .imagen-circulo img {
+        border-radius: 50%;
+        width: 110px;
+        background-color: #fff;
+        height: 110px;
       }
   </style>
   

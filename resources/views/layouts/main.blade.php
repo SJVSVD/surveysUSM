@@ -6,6 +6,7 @@
     <title>Encuesta de evaluación USM</title>
     
     <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="{{ asset('images/usmLogo3.png') }}" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Js Files -->
@@ -18,8 +19,22 @@
             margin: 0;
             padding: 0;
             font-family: 'Montserrat', sans-serif;
-            background-color: #f0f0f0; /* Fondo gris */
+            background-color: #f7f7f7; 
         }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("{{ asset('images/USM_Background.jpeg') }}");
+            background-size: cover; /* Cubre toda la pantalla */
+            opacity: 0.2; /* Ajusta la opacidad de la imagen */
+            z-index: -1; /* Asegura que la imagen esté detrás del contenido */
+        }
+
 
         /* Barra superior azul */
         .navbar {
@@ -41,11 +56,8 @@
         /* Rectángulo en el centro */
         .main-container {
             min-width: 350px;
-            width: 90%;
+            width: 95%;
             margin: 50px auto;
-            padding: 20px;
-            background-color: #fff; /* Blanco */
-            border-radius: 20px; /* Bordes redondeados */
         }
 
     </style>
@@ -83,10 +95,6 @@
             </a>
         </div>
 
-    </div>
-
-    <div class="row p-3">
-        <img src="{{ asset('images/usmLogo.png') }}" style="max-width: 350px; max-height: 80px;" alt="TikTok Icon">
     </div>
 
     <!-- Rectángulo en el centro de la página -->
