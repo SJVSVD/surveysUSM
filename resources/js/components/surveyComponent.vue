@@ -321,7 +321,7 @@
             password: 'ac3e'
           };
 
-          axios.post('http://ec2-18-191-1-205.us-east-2.compute.amazonaws.com/api/admin/login', null, {
+          axios.post('https://evaluacionservicios.usm.cl/api/admin/login', null, {
             headers: {
               authorization: `Basic ${btoa(`${credentials.username}:${credentials.password}`)}`
             }
@@ -338,7 +338,7 @@
 
         },
         loginToken(){
-          axios.post(`http://ec2-18-191-1-205.us-east-2.compute.amazonaws.com/api/encuesta/login`).then( response =>{
+          axios.post(`https://evaluacionservicios.usm.cl/api/encuesta/login`).then( response =>{
               this.token = response.data;
               console.log(response.data);
               this.getSedes();
@@ -353,7 +353,7 @@
             authorization: `${tokenValue}`
           };
 
-          axios.get('http://ec2-18-191-1-205.us-east-2.compute.amazonaws.com/api/encuesta/consulta/sedes', {
+          axios.get('https://evaluacionservicios.usm.cl/api/encuesta/consulta/sedes', {
             headers: headers
           }).then(response => {
             this.sedes = response.data;
@@ -372,7 +372,7 @@
           const idSede = this.encuesta.campus ? this.encuesta.campus.id: null;
           if (idSede) {
             // Actualiza la URL con la id de la sede seleccionada
-            const url = `http://ec2-18-191-1-205.us-east-2.compute.amazonaws.com/api/encuesta/consulta/unidades/${idSede}`;
+            const url = `https://evaluacionservicios.usm.cl/api/encuesta/consulta/unidades/${idSede}`;
 
             axios.get(url, { headers })
               .then(response => {
@@ -395,7 +395,7 @@
             const idUnidad = this.encuesta.unidad ? this.encuesta.unidad.id: null;
             if (idUnidad) {
               // Actualiza la URL con la id de la sede seleccionada
-              const url = `http://ec2-18-191-1-205.us-east-2.compute.amazonaws.com/api/encuesta/consulta/subunidades/${idUnidad}`;
+              const url = `https://evaluacionservicios.usm.cl/api/encuesta/consulta/subunidades/${idUnidad}`;
   
               axios.get(url, { headers })
                 .then(response => {
@@ -480,7 +480,7 @@
           // const idSubUnidad = this.encuesta.subunidad ? this.encuesta.subunidad.id: null;
           // if (idSubUnidad) {
           //   // Actualiza la URL con la id de la sede seleccionada
-          //   const url = `http://ec2-18-191-1-205.us-east-2.compute.amazonaws.com/api/encuesta/larga/consulta/${idSubUnidad}`;
+          //   const url = `https://evaluacionservicios.usm.cl/api/encuesta/larga/consulta/${idSubUnidad}`;
   
           //   axios.get(url, { headers })
           //     .then(response => {
