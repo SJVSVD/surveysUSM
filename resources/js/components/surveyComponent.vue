@@ -7,6 +7,15 @@
         <div class="col-md-4" v-show="group === 1">
           <p class="subtitulo">CAMPUS/SEDE</p>
           <div class="botones-container">
+            <button
+              v-for="sede in sedes"
+              :key="sede"
+              class="boton-naranja"
+              @click="seleccionarSede(sede)"
+              :class="{ 'seleccionado': encuesta.campus === sede }"
+            >
+              {{ sede }}
+            </button>
             <button class="boton-naranja" @click="seleccionarSede('Valparaíso')" :class="{ 'seleccionado': encuesta.campus === 'Valparaíso' }">Valparaíso</button>
             <button class="boton-naranja" @click="seleccionarSede('San Joaquín')" :class="{ 'seleccionado': encuesta.campus === 'San Joaquín' }">San Joaquín</button>
             <button class="boton-naranja" @click="seleccionarSede('Vitacura')" :class="{ 'seleccionado': encuesta.campus === 'Vitacura' }">Vitacura</button>
@@ -42,32 +51,47 @@
         <div class="col-md-4">
           <h2 class="subtitulo">Campus/Sede</h2>
           <div class="botones-container">
-            <button class="boton-naranja" @click="seleccionarSede('Valparaíso')" :class="{ 'seleccionado': encuesta.campus === 'Valparaíso' }">Valparaíso</button>
-            <button class="boton-naranja" @click="seleccionarSede('San Joaquín')" :class="{ 'seleccionado': encuesta.campus === 'San Joaquín' }">San Joaquín</button>
-            <button class="boton-naranja" @click="seleccionarSede('Vitacura')" :class="{ 'seleccionado': encuesta.campus === 'Vitacura' }">Vitacura</button>
-            <button class="boton-naranja" @click="seleccionarSede('Viña del Mar')" :class="{ 'seleccionado': encuesta.campus === 'Viña del Mar' }">Viña del Mar</button>
-            <button class="boton-naranja" @click="seleccionarSede('Concepción')" :class="{ 'seleccionado': encuesta.campus === 'Concepción' }">Concepción</button>
+            <button v-if="sedes"
+              v-for="sede in sedes"
+              :key="sede"
+              class="boton-naranja"
+              @click="seleccionarSede(sede)"
+              :class="{ 'seleccionado': encuesta.campus === sede }"
+            >
+              {{ sede.sede }}
+            </button>
           </div>
         </div>
         <!-- Segundo grupo -->
         <div class="col-md-4">
           <h2 class="subtitulo">Servicios</h2>
           <div class="botones-container">
-            <button class="boton-naranja" @click="seleccionarServicio('Baños')" :class="{ 'seleccionado': encuesta.unidad === 'Baños' }">Baños</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Comedor')" :class="{ 'seleccionado': encuesta.unidad === 'Comedor' }">Comedor</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Cajas')" :class="{ 'seleccionado': encuesta.unidad === 'Cajas' }">Cajas</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Biblioteca')" :class="{ 'seleccionado': encuesta.unidad === 'Biblioteca' }">Biblioteca</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Gimnasios')" :class="{ 'seleccionado': encuesta.unidad === 'Gimnasios' }">Gimnasios</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Laboratorio computacion')" :class="{ 'seleccionado': encuesta.unidad === 'Laboratorio computacion' }">Laboratorio computacion</button>
+            <button v-if="unidades.length > 0"
+            v-for="(servicio, index) in unidades"
+              :key="index"
+              class="boton-naranja"
+              @click="seleccionarServicio(servicio)"
+              :class="{ 'seleccionado': encuesta.unidad === servicio }"
+            >
+              {{ servicio.name }}
+            </button>
+            <button v-else class="boton-naranja">Seleccione un Campus/Sede</button>
           </div>
         </div>
         <!-- Tercer grupo -->
         <div class="col-md-4 ">
           <h2 class="subtitulo">Subservicios</h2>
           <div class="botones-container">
-            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio I')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio I' }">Gimnasio Edificio I</button>
-            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio II')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio II' }">Gimnasio Edificio II</button>
-            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio III')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio III' }">Gimnasio Edificio III</button>
+            <button  v-if="subunidades.length > 0"
+              v-for="(subservicio, index) in subunidades"
+              :key="index"
+              class="boton-naranja"
+              @click="seleccionarSubservicio(subservicio)"
+              :class="{ 'seleccionado': encuesta.subunidad === subservicio }"
+            >
+              {{ subservicio.name }}
+            </button>
+            <button v-else class="boton-naranja">Seleccione un Servicio</button>
           </div>
         </div>
       </div>
@@ -187,36 +211,10 @@
       valorSeleccionado: 0, 
       estrellaHover: null,
       showModal: false,
-      preguntas: [
-        {
-          "grupo": "Negativa",
-          "id": 44,
-          "opciones": [
-            {"id": 231, "opcion": "Horario atención ", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null},
-            {"id": 232, "opcion": "Instalaciones", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null},
-            {"id": 233, "opcion": "Atención del personal", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null},
-            {"id": 234, "opcion": "Mantenimiento aparatos/equipos ", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null},
-            {"id": 235, "opcion": "Camerinos", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null},
-            {"id": 236, "opcion": "Disponibilidad de lockers", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null},
-            {"id": 237, "opcion": "Limpieza e higiene en general", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null},
-            {"id": 239, "opcion": "Disponibilidad alcohol gel", "pregunta": null, "pregunta_id": 44, "query": null, "query_class": null, "registry": null}
-          ],
-          "orden": 1,
-          "pregunta": "Su calificación se debió principalmente a:  ",
-          "tipo": "Opciones"
-        },
-        {
-          "grupo": "Negativa",
-          "id": 15,
-          "opciones": [],
-          "orden": 2,
-          "pregunta": "Si lo deseas, puedes dejarnos tu comentario o indicar en qué podemos mejorar",
-          "tipo": "Texto"
-        },
-      ]
+      preguntas: [],
     }),
     created(){
-      this.loginToken();
+      //this.loginToken();
       this.loginAdmin();
       // Obtener la URL actual
       const url = window.location.href;
@@ -288,6 +286,7 @@
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
             this.showModal = true;
           }
+          this.getSubunidades(this.tokenAdmin);
         },
         seleccionarSubservicio(subservicio) {
           this.encuesta.subunidad = subservicio;
@@ -303,6 +302,7 @@
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
             this.showModal = true;
           }
+          this.getUnidades(this.tokenAdmin);
         },
         limitarSeleccion() {
           // Limita la selección a un máximo de 2 checkboxes
@@ -330,6 +330,7 @@
               const token = response.data.token;
               console.log('Token recibido:', token);
               this.tokenAdmin = token;
+              this.getSedes2(this.tokenAdmin);
               // Aquí puedes almacenar o utilizar el token según tus necesidades
             })
             .catch(error => {
@@ -339,15 +340,12 @@
         },
         loginToken(){
           axios.post(`https://evaluacionservicios.usm.cl/api/encuesta/login`).then( response =>{
-              this.token = response.data;
-              console.log(response.data);
-              this.getSedes();
-              //this.getUnidades()
+              this.token = response.data.token;
+              //this.getSedes(this.token);
           }).catch(e=> console.log(e))
         },
-        getSedes() {
-          const tokenValue = this.token.token;
-          console.log(tokenValue);
+        getSedes(token) {
+          const tokenValue = token;
           // Configuración de los encabezados con el token
           const headers = {
             authorization: `${tokenValue}`
@@ -357,14 +355,29 @@
             headers: headers
           }).then(response => {
             this.sedes = response.data;
-            console.log(response);
           }).catch(error => {
             console.log(error);
           });
         },
-        getUnidades() {
+        getSedes2(token) {
+          const tokenValue = token;
+          // Configuración de los encabezados con el token
+          const headers = {
+            authorization: `${tokenValue}`
+          };
+
+          axios.get('https://evaluacionservicios.usm.cl/api/admin/totem/agregar/sede', {
+            headers: headers
+          }).then(response => {
+            this.sedes = response.data;
+            console.log(this.sedes);
+          }).catch(error => {
+            console.log(error);
+          });
+        },
+        getUnidades(token) {
           this.encuesta.unidad = '';
-          const tokenValue = this.token.token;
+          const tokenValue = token;
           const headers = {
             authorization: `${tokenValue}`
           };
@@ -372,40 +385,38 @@
           const idSede = this.encuesta.campus ? this.encuesta.campus.id: null;
           if (idSede) {
             // Actualiza la URL con la id de la sede seleccionada
-            const url = `https://evaluacionservicios.usm.cl/api/encuesta/consulta/unidades/${idSede}`;
+            const url = `https://evaluacionservicios.usm.cl/api/admin/totem/agregar/unidad/${idSede}`;
 
             axios.get(url, { headers })
               .then(response => {
-                this.unidades = response.data;
-                console.log(response);
+                this.unidades = response.data.unidades;
+                console.log(this.unidades);
               })
               .catch(error => {
                 console.error(error);
               });
           }
         },
-        getSubunidades() {
-          if(this.encuesta.unidad.subunidades){
-            this.encuesta.subunidad = '';
-            const tokenValue = this.token.token;
-            const headers = {
-              authorization: `${tokenValue}`
-            };
-  
-            const idUnidad = this.encuesta.unidad ? this.encuesta.unidad.id: null;
-            if (idUnidad) {
-              // Actualiza la URL con la id de la sede seleccionada
-              const url = `https://evaluacionservicios.usm.cl/api/encuesta/consulta/subunidades/${idUnidad}`;
-  
-              axios.get(url, { headers })
-                .then(response => {
-                  this.subunidades = response.data;
-                  console.log(response);
-                })
-                .catch(error => {
-                  console.error(error);
-                });
-            }
+        getSubunidades(token) {
+          this.encuesta.subunidad = '';
+          const tokenValue = token;
+          const headers = {
+            authorization: `${tokenValue}`
+          };
+
+          const idUnidad = this.encuesta.unidad ? this.encuesta.unidad.id: null;
+          if (idUnidad) {
+            // Actualiza la URL con la id de la sede seleccionada
+            const url = `https://evaluacionservicios.usm.cl/api/admin/totem/agregar/subunidad/${idUnidad}`;
+
+            axios.get(url, { headers })
+              .then(response => {
+                console.log(response.data);
+                this.subunidades = response.data.sub_unidades;
+              })
+              .catch(error => {
+                console.error(error);
+              });
           }
         },
         handleClick(){
@@ -453,44 +464,64 @@
         handleClick2(){
           this.showModal = false;
           if(this.valorSeleccionado < 5){
+            this.longSurvey(this.tokenAdmin);
             this.encuestaLarga = true;
           }else{
+            this.respuestaCorta(this.token);
             this.pantallaGracias = true;
           }
         },
-        longSurvey(){
-          this.siguientePaso = false;
-          this.pantallaGracias = false;
-          this.preguntas.forEach(pregunta => {
-            if (pregunta.tipo === 'Opciones') {
-              pregunta.opciones.forEach(opcion => {
-                opcion.seleccionado = false;
-              });
-            } else if (pregunta.tipo === 'Texto') {
-              // Limpia el campo de texto
-              pregunta.respuestaTexto = ''; // Asegúrate de tener respuestaTexto en tus datos
-            }
-          });
-          this.encuestaLarga = true;
-          // const tokenValue = this.token.token;
-          // const headers = {
-          //   authorization: `${tokenValue}`
-          // };
-  
-          // const idSubUnidad = this.encuesta.subunidad ? this.encuesta.subunidad.id: null;
-          // if (idSubUnidad) {
-          //   // Actualiza la URL con la id de la sede seleccionada
-          //   const url = `https://evaluacionservicios.usm.cl/api/encuesta/larga/consulta/${idSubUnidad}`;
-  
-          //   axios.get(url, { headers })
-          //     .then(response => {
-          //       this.preguntas = response.data;
-          //       console.log(response);
-          //     })
-          //     .catch(error => {
-          //       console.error(error);
+        respuestaCorta(token){
+           const tokenValue = token;
+           const headers = {
+             authorization: `${tokenValue}`
+           };
+
+            axios.post('https://evaluacionservicios.usm.cl/api/encuesta/respuesta', {
+              totem: 1,
+              subunidad: 1,
+              respuesta: 'aaaaa'
+            }, {
+              headers: {
+                Authorization: 'Bearer ' + token
+              }
+            })
+            .then(response => {
+              console.log(response);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        },
+        longSurvey(token){
+          // this.preguntas.forEach(pregunta => {
+          //   if (pregunta.tipo === 'Opciones') {
+          //     pregunta.opciones.forEach(opcion => {
+          //       opcion.seleccionado = false;
           //     });
-          // }
+          //   } else if (pregunta.tipo === 'Texto') {
+          //     // Limpia el campo de texto
+          //     pregunta.respuestaTexto = ''; // Asegúrate de tener respuestaTexto en tus datos
+          //   }
+          // });
+           const tokenValue = token;
+           const headers = {
+             authorization: `${tokenValue}`
+           };
+  
+           const idSubUnidad = this.encuesta.subunidad ? this.encuesta.subunidad.id: null;
+           if (idSubUnidad){
+             const url = `https://evaluacionservicios.usm.cl/api/encuesta/larga/consulta/${idSubUnidad}`;
+  
+             axios.get(url, { headers })
+               .then(response => {
+                 this.preguntas = response.data;
+                 console.log(response);
+               })
+               .catch(error => {
+                 console.error(error);
+               });
+           }
         },
     },
   };
