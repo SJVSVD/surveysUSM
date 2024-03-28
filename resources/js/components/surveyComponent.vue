@@ -7,41 +7,47 @@
         <div class="col-md-4" v-show="group === 1">
           <p class="subtitulo">CAMPUS/SEDE</p>
           <div class="botones-container">
-            <button
+            <button v-if="sedes"
               v-for="sede in sedes"
               :key="sede"
               class="boton-naranja"
               @click="seleccionarSede(sede)"
               :class="{ 'seleccionado': encuesta.campus === sede }"
             >
-              {{ sede }}
+              {{ sede.sede }}
             </button>
-            <button class="boton-naranja" @click="seleccionarSede('Valparaíso')" :class="{ 'seleccionado': encuesta.campus === 'Valparaíso' }">Valparaíso</button>
-            <button class="boton-naranja" @click="seleccionarSede('San Joaquín')" :class="{ 'seleccionado': encuesta.campus === 'San Joaquín' }">San Joaquín</button>
-            <button class="boton-naranja" @click="seleccionarSede('Vitacura')" :class="{ 'seleccionado': encuesta.campus === 'Vitacura' }">Vitacura</button>
-            <button class="boton-naranja" @click="seleccionarSede('Viña del Mar')" :class="{ 'seleccionado': encuesta.campus === 'Viña del Mar' }">Viña del Mar</button>
-            <button class="boton-naranja" @click="seleccionarSede('Concepción')" :class="{ 'seleccionado': encuesta.campus === 'Concepción' }">Concepción</button>
           </div>
         </div>
         <!-- Segundo grupo -->
         <div class="col-md-4 " v-show="group === 2">
           <p class="subtitulo">SERVICIOS</p>
           <div class="botones-container">
-            <button class="boton-naranja" @click="seleccionarServicio('Baños')" :class="{ 'seleccionado': encuesta.unidad === 'Baños' }">Baños</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Comedor')" :class="{ 'seleccionado': encuesta.unidad === 'Comedor' }">Comedor</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Cajas')" :class="{ 'seleccionado': encuesta.unidad === 'Cajas' }">Cajas</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Biblioteca')" :class="{ 'seleccionado': encuesta.unidad === 'Biblioteca' }">Biblioteca</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Gimnasios')" :class="{ 'seleccionado': encuesta.unidad === 'Gimnasios' }">Gimnasios</button>
-            <button class="boton-naranja" @click="seleccionarServicio('Laboratorio computacion')" :class="{ 'seleccionado': encuesta.unidad === 'Laboratorio computacion' }">Laboratorio computacion</button>
+            <button v-if="unidades.length > 0"
+            v-for="(servicio, index) in unidades"
+              :key="index"
+              class="boton-naranja"
+              @click="seleccionarServicio(servicio)"
+              :class="{ 'seleccionado': encuesta.unidad === servicio }"
+            >
+              {{ servicio.name }}
+            </button>
+            <button v-else class="boton-naranja">Seleccione un Campus/Sede</button>
           </div>
         </div>
         <!-- Tercer grupo -->
         <div class="col-md-4 " v-show="group === 3">
           <p class="subtitulo">SUBSERVICIOS</p>
           <div class="botones-container">
-            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio I')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio I' }">Gimnasio Edificio I</button>
-            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio II')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio II' }">Gimnasio Edificio II</button>
-            <button class="boton-naranja" @click="seleccionarSubservicio('Gimnasio Edificio III')" :class="{ 'seleccionado': encuesta.subunidad === 'Gimnasio Edificio III' }">Gimnasio Edificio III</button>
+            <button  v-if="subunidades.length > 0"
+              v-for="(subservicio, index) in subunidades"
+              :key="index"
+              class="boton-naranja"
+              @click="seleccionarSubservicio(subservicio)"
+              :class="{ 'seleccionado': encuesta.subunidad === subservicio }"
+            >
+              {{ subservicio.name }}
+            </button>
+            <button v-else class="boton-naranja">Seleccione un Servicio</button>
           </div>
         </div>
         <button v-if="group != 1" class="boton-azul2" @click="group = group - 1">Volver</button>
