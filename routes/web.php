@@ -13,7 +13,7 @@ use App\Http\Controllers\PageController;
 |
 */
 
-Route::get('/', function () {return redirect('/survey');});
+Route::get('/', function () {return redirect('/otra-pagina');});
 
 Route::get('/survey/{id?}', [PageController::class, 'survey'])->name('survey');
 
