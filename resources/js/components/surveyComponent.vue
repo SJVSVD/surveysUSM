@@ -225,7 +225,6 @@
       
       if(this.id != 'survey'){
         console.log('El ID es:', this.id);
-        this.siguientePaso = true;
         this.subunidad = this.id;
       }
       
