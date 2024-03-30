@@ -1,11 +1,11 @@
 <!-- MyComponent.vue -->
 <template>
     <div v-if="siguientePaso == false"> 
-      <h3 class="titulo">Encuesta de evaluación de calidad </h3>
+      <h3 class="titulo">Encuesta de evaluación de calidad</h3>
       <div class="row" v-if="isMobile">
         <!-- Primer grupo -->
         <div class="col-md-4" v-show="group === 1">
-          <p class="subtitulo">CAMPUS/SEDE</p>
+          <p class="subtitulo">Campus/Sede</p>
           <div class="botones-container">
             <button v-if="sedes"
               v-for="sede in sedes"
@@ -20,7 +20,7 @@
         </div>
         <!-- Segundo grupo -->
         <div class="col-md-4 " v-show="group === 2">
-          <p class="subtitulo">SERVICIOS</p>
+          <p class="subtitulo">Servicios</p>
           <div class="botones-container">
             <button v-if="unidades.length > 0"
             v-for="(servicio, index) in unidades"
@@ -36,14 +36,14 @@
         </div>
         <!-- Tercer grupo -->
         <div class="col-md-4 " v-show="group === 3">
-          <p class="subtitulo">SUBSERVICIOS</p>
+          <p class="subtitulo">Subservicios</p>
           <div class="botones-container">
             <button  v-if="subunidades.length > 0"
               v-for="(subservicio, index) in subunidades"
               :key="index"
               class="boton-naranja"
-              @click="seleccionarSubservicio(subservicio)"
-              :class="{ 'seleccionado': encuesta.subunidad === subservicio }"
+              @click="seleccionarSubservicio(subservicio.id)"
+              :class="{ 'seleccionado': encuesta.subunidad === subservicio.id }"
             >
               {{ subservicio.name }}
             </button>
@@ -51,6 +51,8 @@
           </div>
         </div>
         <button v-if="group != 1" class="boton-azul2" @click="group = group - 1">Volver</button>
+        &nbsp;
+        <button v-if="group != 3" class="boton-azul2" @click="group = group + 1">Siguiente</button>
       </div>
       <div class="row" v-else>
         <!-- Primer grupo -->
@@ -92,8 +94,8 @@
               v-for="(subservicio, index) in subunidades"
               :key="index"
               class="boton-naranja"
-              @click="seleccionarSubservicio(subservicio)"
-              :class="{ 'seleccionado': encuesta.subunidad === subservicio }"
+              @click="seleccionarSubservicio(subservicio.id)"
+              :class="{ 'seleccionado': encuesta.subunidad === subservicio.id }"
             >
               {{ subservicio.name }}
             </button>
@@ -107,7 +109,7 @@
       <div class="modal-contenido">
         <div class="modal-cuerpo">
           <div class="row">
-            <h2 class="subtitulo2 pt-4">¿Cómo evalúas tu experiencia?</h2>
+            <h2 class="subtitulo2 pt-5">¿Cómo evalúas tu experiencia?</h2>
             <div class="boton-estrella-container">
               <div
                 class="boton-estrella"
@@ -152,42 +154,51 @@
         </div>
       </div>
     </div>
-    <div class="modal" v-if="encuestaLarga" >
-      <div class="modal-contenido3">
+
+    <div class="modal" v-if="encuestaLarga">
+    <div class="modal-contenido3">
         <div class="modal-cuerpo">
-          <div class="row">
-            <div class="col-md-12 ">
-              <h2 class="subtitulo2">¿Cómo evalúas tu experiencia?</h2>
-              <div class="contenedor-centralizado">
-                <div v-for="pregunta in preguntas" :key="pregunta.id">
-                  <div v-if="pregunta.tipo === 'Opciones'">
-                    <h4>{{ pregunta.pregunta }}</h4>
-                    <div class="form-check" v-for="opcion in pregunta.opciones" :key="opcion.id">
-                      <input class="form-check-input" type="checkbox" :id="'opcion_' + opcion.id" v-model="opcion.seleccionado" @change="limitarSeleccion">
-                      <label class="form-check-label" :for="'opcion_' + opcion.id">{{ opcion.opcion }}</label>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="subtitulo2">¿Cómo evalúas tu experiencia?</h2>
+                    <div class="contenedor-centralizado">
+                        <div v-for="pregunta in preguntas" :key="pregunta.id">
+                            <div v-if="pregunta.tipo === 'Opciones'">
+                                <h4>{{ pregunta.pregunta }}</h4>
+                                <div class="form-check" v-for="opcion in pregunta.opciones" :key="opcion.id">
+                                    <input class="form-check-input" type="checkbox" :id="'opcion_' + opcion.id" v-model="opcion.seleccionado" @change="limitarSeleccion">
+                                    <label class="form-check-label" :for="'opcion_' + opcion.id">{{ opcion.opcion }}</label>
+                                </div>
+                                <br>
+                            </div>
+                            <div v-else-if="pregunta.tipo === 'Texto'">
+                                <div class="form-group">
+                                    <label :for="'texto_' + pregunta.id">{{ pregunta.pregunta }}</label>
+                                    <textarea class="form-control" :id="'texto_' + pregunta.id" v-model="pregunta.respuesta" rows="3"></textarea>
+                                </div>
+                                <br>
+                            </div>
+                        </div>
                     </div>
-                    <br>
-                  </div>
-                  <div v-else-if="pregunta.tipo === 'Texto'">
+
+                    <!-- Campo de texto para el correo electrónico -->
                     <div class="form-group">
-                      <label :for="'texto_' + pregunta.id">{{ pregunta.pregunta }}</label>
-                      <textarea class="form-control" :id="'texto_' + pregunta.id" rows="3"></textarea>
+                        <label for="email">Ingrese su email</label>
+                        <input type="email" class="form-control" id="email"  v-model="email">
                     </div>
                     <br>
-                  </div>
+                    <div class="contenedor-centralizado">
+                        <button class="boton-azul2" @click="showModal = true, encuestaLarga = false">Volver</button>
+                        &nbsp;
+                        <button class="boton-azul2 float-end" @click="respuestaLarga">Enviar</button>
+                    </div>
                 </div>
-                
-                <div class="contenedor-centralizado">
-                  <button class="boton-azul2" @click="showModal = true,encuestaLarga = false">Volver</button>
-                  &nbsp;
-                  <button class="boton-azul2 float-end" @click="handleClick2">Enviar</button>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
+</div>
+
+
   </template>
   
   <script>
@@ -203,6 +214,7 @@
         unidad: '',
         subunidad: '',
       },
+      email: '',
       isMobile: false,
       group: 1,
       errors: [],
@@ -214,13 +226,13 @@
       encuestaLarga: false,
       siguientePaso: false,
       pantallaGracias: false,
-      valorSeleccionado: 0, 
+      valorSeleccionado: null, 
       estrellaHover: null,
       showModal: false,
       preguntas: [],
     }),
     created(){
-      //this.loginToken();
+      this.loginToken();
       this.loginAdmin();
       // Obtener la URL actual
       const url = window.location.href;
@@ -228,10 +240,15 @@
       // Extraer el ID de la URL
       const urlParts = url.split('/');
       this.id = urlParts[urlParts.length - 1];
-      
-      if(this.id != 'survey'){
-        console.log('El ID es:', this.id);
-        this.subunidad = this.id;
+
+      // Verificar si hay un ID de subunidad después de la barra en la URL
+      if (!isNaN(parseInt(this.id))) {
+          console.log('El ID es:', this.id);
+          this.encuesta.subunidad = this.id;
+          this.longSurvey(this.tokenAdmin, this.encuesta.subunidad);
+          this.encuestaLarga = true;
+      } else {
+          console.log('No se encontró un ID de subunidad válido en la URL.');
       }
       
     },
@@ -247,11 +264,24 @@
       document.removeEventListener('keydown', this.cerrarModalConEscape);
     },
     methods: {
+        ordenarPreguntas() {
+          // Ordena las preguntas para que las de tipo 'Opciones' aparezcan primero
+          this.preguntas.sort((a, b) => {
+              if (a.tipo === 'Opciones' && b.tipo !== 'Opciones') {
+                  return -1;
+              } else if (a.tipo !== 'Opciones' && b.tipo === 'Opciones') {
+                  return 1;
+              } else {
+                  return 0;
+              }
+          });
+        },
         startAgain(){
           if(this.isMobile){
             this.group = 1;
           };
-          this.valorSeleccionado = 0; 
+          this.valorSeleccionado = null; 
+          this.email = '';
           this.siguientePaso = false;
           this.pantallaGracias = false;
           this.encuestaLarga = false; 
@@ -347,6 +377,7 @@
           axios.post(`https://evaluacionservicios.usm.cl/api/encuesta/login`).then( response =>{
               this.token = response.data.token;
               //this.getSedes(this.token);
+              console.log(this.token);
           }).catch(e=> console.log(e))
         },
         getSedes(token) {
@@ -467,67 +498,132 @@
             }
         },
         handleClick2(){
-          this.showModal = false;
-          if(this.valorSeleccionado < 5){
-            this.longSurvey(this.tokenAdmin);
-            this.encuestaLarga = true;
-          }else{
-            this.respuestaCorta(this.token);
-            this.pantallaGracias = true;
+          if(this.valorSeleccionado === undefined || this.valorSeleccionado === null){
+            this.toast.warning( 'Por favor seleccione un valor', {
+                position: "top-right",
+                timeout: 5000,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: true,
+                closeButton: "button",
+                icon: true,
+                rtl: false
+              });
+            return; 
           }
-        },
+
+          this.showModal = false;
+          if(this.valorSeleccionado < 4){
+              this.longSurvey(this.tokenAdmin, this.encuesta.subunidad);
+              this.encuestaLarga = true;
+          }else{
+              this.respuestaCorta(this.tokenAdmin);
+              this.pantallaGracias = true;
+          }
+      },
         respuestaCorta(token){
            const tokenValue = token;
-           const headers = {
-             authorization: `${tokenValue}`
-           };
-
-            axios.post('https://evaluacionservicios.usm.cl/api/encuesta/respuesta', {
+           axios.post('/api/respuestaCorta', {
+              token: tokenValue,
               totem: 1,
-              subunidad: 1,
-              respuesta: 'aaaaa'
-            }, {
-              headers: {
-                Authorization: 'Bearer ' + token
-              }
+              subunidad: this.encuesta.subunidad,
+              respuesta: this.valorSeleccionado,
             })
             .then(response => {
-              console.log(response);
+              console.log(response.data); // Aquí puedes manejar la respuesta recibida
             })
             .catch(error => {
-              console.error(error);
+              console.error(error); // Maneja cualquier error que ocurra durante la solicitud
             });
         },
-        longSurvey(token){
-          // this.preguntas.forEach(pregunta => {
-          //   if (pregunta.tipo === 'Opciones') {
-          //     pregunta.opciones.forEach(opcion => {
-          //       opcion.seleccionado = false;
-          //     });
-          //   } else if (pregunta.tipo === 'Texto') {
-          //     // Limpia el campo de texto
-          //     pregunta.respuestaTexto = ''; // Asegúrate de tener respuestaTexto en tus datos
-          //   }
-          // });
+        respuestaLarga(){
+            // Arreglo para almacenar las respuestas
+            const respuestas = [];
+
+            // Recorre el arreglo de preguntas y construye el arreglo de respuestas
+            this.preguntas.forEach(pregunta => {
+                // Si la pregunta es de tipo 'Opciones'
+                if (pregunta.tipo === 'Opciones') {
+                    pregunta.opciones.forEach(opcion => {
+                        // Verifica si la opción está seleccionada
+                        if (opcion.seleccionado) {
+                            const respuesta = {
+                                subunidad_id: this.encuesta.subunidad,
+                                pregunta_id: pregunta.id,
+                                respuesta: opcion.opcion,
+                            };
+                            respuestas.push(respuesta);
+                        }
+                    });
+                }else if (pregunta.tipo === 'Texto') { // Si la pregunta es de tipo 'Texto'
+                  const respuestaTexto = pregunta.respuesta; // Obtiene la respuesta del campo pregunta.respuesta
+                  if (respuestaTexto) { // Verifica si la respuesta de texto no está vacía
+                      const respuesta = {
+                          subunidad_id: this.encuesta.subunidad,
+                          pregunta_id: pregunta.id,
+                          respuesta: respuestaTexto, // Usa la respuesta del campo pregunta.respuesta
+                      };
+                      respuestas.push(respuesta);
+                  }
+              }
+            });
+
+            console.log(respuestas.length);
+
+            // Verifica que haya al menos 2 respuestas y que el campo this.email no esté vacío
+            if (respuestas.length >= 2 && this.email.trim() !== '') {
+                axios.post('/api/respuestaLarga', {
+                    email: this.email,
+                    respuestas: respuestas
+                })
+                .then(response => {
+                    console.log(response.data);
+                    this.pantallaGracias = true;
+                    this.encuestaLarga = false;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            }else{
+              this.toast.warning( 'Por favor, Ingrese su respuesta', {
+                position: "top-right",
+                timeout: 5000,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: true,
+                closeButton: "button",
+                icon: true,
+                rtl: false
+              });
+            }
+
+        },
+        longSurvey(token,id){
            const tokenValue = token;
            const headers = {
              authorization: `${tokenValue}`
            };
   
-           const idSubUnidad = this.encuesta.subunidad ? this.encuesta.subunidad.id: null;
-           if (idSubUnidad){
-             const url = `https://evaluacionservicios.usm.cl/api/encuesta/larga/consulta/${idSubUnidad}`;
+          const url = `https://evaluacionservicios.usm.cl/api/encuesta/larga/consulta/${id}`;
   
-             axios.get(url, { headers })
-               .then(response => {
-                 this.preguntas = response.data;
-                 console.log(response);
-               })
-               .catch(error => {
-                 console.error(error);
-               });
-           }
-        },
+            axios.get(url, { headers })
+              .then(response => {
+                this.preguntas = response.data;
+                console.log(response);
+                this.ordenarPreguntas();
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          }
     },
   };
   </script>
