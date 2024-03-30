@@ -527,7 +527,7 @@
       },
         respuestaCorta(token){
            const tokenValue = token;
-           axios.post('survey/api/respuestaCorta', {
+           axios.post('/api/respuestaCorta', {
               token: tokenValue,
               totem: 1,
               subunidad: this.encuesta.subunidad,
@@ -576,7 +576,7 @@
 
             // Verifica que haya al menos 2 respuestas y que el campo this.email no esté vacío
             if (respuestas.length >= 2 && this.email.trim() !== '') {
-                axios.post('survey/api/respuestaLarga', {
+                axios.post('/api/respuestaLarga', {
                     email: this.email,
                     respuestas: respuestas
                 })
