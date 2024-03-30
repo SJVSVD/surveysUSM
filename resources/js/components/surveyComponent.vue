@@ -243,10 +243,9 @@
 
       // Verificar si hay un ID de subunidad después de la barra en la URL
       if (!isNaN(parseInt(this.id))) {
-          console.log('El ID es:', this.id);
+          //console.log('El ID es:', this.id);
           this.encuesta.subunidad = this.id;
-          this.longSurvey(this.tokenAdmin, this.encuesta.subunidad);
-          this.encuestaLarga = true;
+          this.showModal = true;
       } else {
           console.log('No se encontró un ID de subunidad válido en la URL.');
       }
@@ -363,7 +362,7 @@
           })
             .then(response => {
               const token = response.data.token;
-              console.log('Token recibido:', token);
+              //console.log('Token recibido:', token);
               this.tokenAdmin = token;
               this.getSedes2(this.tokenAdmin);
               // Aquí puedes almacenar o utilizar el token según tus necesidades
@@ -377,7 +376,7 @@
           axios.post(`https://evaluacionservicios.usm.cl/api/encuesta/login`).then( response =>{
               this.token = response.data.token;
               //this.getSedes(this.token);
-              console.log(this.token);
+              //console.log(this.token);
           }).catch(e=> console.log(e))
         },
         getSedes(token) {
@@ -406,7 +405,7 @@
             headers: headers
           }).then(response => {
             this.sedes = response.data;
-            console.log(this.sedes);
+            //console.log(this.sedes);
           }).catch(error => {
             console.log(error);
           });
@@ -426,7 +425,7 @@
             axios.get(url, { headers })
               .then(response => {
                 this.unidades = response.data.unidades;
-                console.log(this.unidades);
+                //console.log(this.unidades);
               })
               .catch(error => {
                 console.error(error);
@@ -447,7 +446,7 @@
 
             axios.get(url, { headers })
               .then(response => {
-                console.log(response.data);
+                //console.log(response.data);
                 this.subunidades = response.data.sub_unidades;
               })
               .catch(error => {
@@ -572,7 +571,7 @@
               }
             });
 
-            console.log(respuestas.length);
+            //console.log(respuestas.length);
 
             // Verifica que haya al menos 2 respuestas y que el campo this.email no esté vacío
             if (respuestas.length >= 2 && this.email.trim() !== '') {
@@ -581,7 +580,7 @@
                     respuestas: respuestas
                 })
                 .then(response => {
-                    console.log(response.data);
+                    //console.log(response.data);
                     this.pantallaGracias = true;
                     this.encuestaLarga = false;
                 })
@@ -617,7 +616,7 @@
             axios.get(url, { headers })
               .then(response => {
                 this.preguntas = response.data;
-                console.log(response);
+                //console.log(response);
                 this.ordenarPreguntas();
               })
               .catch(error => {
