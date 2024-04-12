@@ -17,7 +17,6 @@
         /* Estilos personalizados */
         body {
             margin: 0;
-            overflow: hidden;
             padding: 0;
             font-family: 'Montserrat', sans-serif;
             background-color: #f7f7f7; 
