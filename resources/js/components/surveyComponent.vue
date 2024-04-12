@@ -42,7 +42,7 @@
               v-for="(subservicio, index) in subunidades"
               :key="index"
               class="boton-naranja"
-              @click="seleccionarSubservicio(subservicio.id)"
+              @click="seleccionarSubservicio(subservicio)"
               :class="{ 'seleccionado': encuesta.subunidad === subservicio.id }"
             >
               {{ subservicio.name }}
@@ -94,7 +94,7 @@
               v-for="(subservicio, index) in subunidades"
               :key="index"
               class="boton-naranja"
-              @click="seleccionarSubservicio(subservicio.id)"
+              @click="seleccionarSubservicio(subservicio)"
               :class="{ 'seleccionado': encuesta.subunidad === subservicio.id }"
             >
               {{ subservicio.name }}
@@ -109,7 +109,8 @@
       <div class="modal-contenido">
         <div class="modal-cuerpo">
           <div class="row">
-            <h2 class="subtitulo2 pt-5">¿Cómo evalúas tu experiencia?</h2>
+            <h2 class="subtitulo2 pt-3">¿Cómo evalúas tu experiencia?</h2>
+            <h1 class="subtitulo3 ">en {{ subUnidadName }}</h1>
             <div class="boton-estrella-container">
               <div
                 class="boton-estrella"
@@ -131,10 +132,11 @@
               </div>
             </div>
             <div class="contenedor-centralizado pt-4">
-              <button class="boton-azul" @click="showModal = false">Volver</button>
+              <button class="boton-azul" @click="showModal = false; valorSeleccionado = null;">Volver</button>
               &nbsp;
               <button class="boton-azul float-end" @click="handleClick2">Enviar Feedback</button>
             </div>
+            <!-- <p class="subtitulo3 pt-2">Subservicio seleccionado: {{ subUnidadName }}</p> -->
           </div>
         </div>
       </div>
@@ -169,11 +171,19 @@
                                     <input class="form-check-input" type="checkbox" :id="'opcion_' + opcion.id" v-model="opcion.seleccionado" @change="limitarSeleccion">
                                     <label class="form-check-label" :for="'opcion_' + opcion.id">{{ opcion.opcion }}</label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="opcion_otro" v-model="opcionOtroSeleccionado" @change="mostrarCampoOtro">
+                                    <label class="form-check-label" for="opcion_otro">Otro</label>
+                                </div>
+                                <!-- Campo de texto para "Otro" -->
+                                <div v-if="opcionOtroSeleccionado">
+                                    <input type="text" class="form-control" v-model="respuestaOtro" placeholder="Especificar otro">
+                                </div>
                                 <br>
                             </div>
                             <div v-else-if="pregunta.tipo === 'Texto'">
                                 <div class="form-group">
-                                    <label :for="'texto_' + pregunta.id">{{ pregunta.pregunta }}</label>
+                                    <label :for="'texto_' + pregunta.id">{{ pregunta.pregunta }}:</label>
                                     <textarea class="form-control" :id="'texto_' + pregunta.id" v-model="pregunta.respuesta" rows="3"></textarea>
                                 </div>
                                 <br>
@@ -183,7 +193,7 @@
 
                     <!-- Campo de texto para el correo electrónico -->
                     <div class="form-group">
-                        <label for="email">Ingrese su email</label>
+                        <label for="email">Si deseas ser contactado, por favor ingresa tu correo electrónico: </label>
                         <input type="email" class="form-control" id="email"  v-model="email">
                     </div>
                     <br>
@@ -221,6 +231,7 @@
       sedes: [],
       unidades: [],
       subunidades: [],
+      subUnidadName: '',
       token: '',
       tokenAdmin: '',
       encuestaLarga: false,
@@ -230,6 +241,8 @@
       estrellaHover: null,
       showModal: false,
       preguntas: [],
+      opcionOtroSeleccionado: false, 
+      respuestaOtro: ''
     }),
     created(){
       this.loginToken();
@@ -245,6 +258,7 @@
       if (!isNaN(parseInt(this.id))) {
           //console.log('El ID es:', this.id);
           this.encuesta.subunidad = this.id;
+          this.getSubunidadName(this.encuesta.subunidad);
           this.showModal = true;
       } else {
           console.log('No se encontró un ID de subunidad válido en la URL.');
@@ -263,6 +277,19 @@
       document.removeEventListener('keydown', this.cerrarModalConEscape);
     },
     methods: {
+        mostrarCampoOtro() {
+            // Si la opción "Otro" está seleccionada, se muestra el campo de texto, de lo contrario se oculta
+            if (this.opcionOtroSeleccionado) {
+                this.respuestaOtro = ''; // Reiniciar la respuesta si se selecciona la opción "Otro"
+            }
+        },
+        getSubunidadName(id){
+          axios.get(`https://evaluacionservicios.usm.cl/api/subunidad/nombre/${id}`).then(response => {
+            this.subUnidadName = response.data;
+          }).catch(error => {
+            console.log(error);
+          });
+        },
         ordenarPreguntas() {
           // Ordena las preguntas para que las de tipo 'Opciones' aparezcan primero
           this.preguntas.sort((a, b) => {
@@ -287,6 +314,8 @@
           this.encuesta.campus = '';
           this.encuesta.unidad = ''; 
           this.encuesta.subunidad = '';
+          this.unidades = [];
+          this.subunidades = [];
         },
         checkMobile() {
           this.isMobile = window.innerWidth <= 576;
@@ -295,6 +324,7 @@
           // Verificar si la tecla presionada es la tecla "Escape"
           if (evento.keyCode === 27) {
             // Lógica para cerrar el modal aquí
+            this.valorSeleccionado = null;
             this.showModal = false;
             this.pantallaGracias = false;
             this.encuestaLarga = false;
@@ -313,28 +343,39 @@
           this.estrellaHover = null;
         },
         seleccionarServicio(servicio) {
+          this.encuesta.subunidad = '';
+          this.subunidades = [];
           this.encuesta.unidad = servicio;
           if(this.isMobile){
             this.group = 3;
           }
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
             this.showModal = true;
+            this.valorSeleccionado = null;
           }
           this.getSubunidades(this.tokenAdmin);
         },
         seleccionarSubservicio(subservicio) {
-          this.encuesta.subunidad = subservicio;
+          this.encuesta.subunidad = subservicio.id;
+          this.subUnidadName = subservicio.name;
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
             this.showModal = true;
+            this.valorSeleccionado = null;
           }
         },
         seleccionarSede(sede) {
+          this.encuesta.unidad = ''; 
+          this.encuesta.subunidad = '';
+          this.subunidades = [];
+          this.unidades = [];
+
           this.encuesta.campus = sede;
           if(this.isMobile){
             this.group = 2;
           }
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
             this.showModal = true;
+            this.valorSeleccionado = null;
           }
           this.getUnidades(this.tokenAdmin);
         },
@@ -540,8 +581,34 @@
             });
         },
         respuestaLarga(){
+
+          const respuestas = [];
+
+            if(this.opcionOtroSeleccionado && this.respuestaOtro == ''){
+              this.toast.warning( 'El campo Otro es requerido', {
+                position: "top-right",
+                timeout: 5000,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: true,
+                closeButton: "button",
+                icon: true,
+                rtl: false
+              });
+              return;
+            }else if(this.opcionOtroSeleccionado){
+              const respuesta = {
+                  subunidad_id: this.encuesta.subunidad,
+                  pregunta_id: 'Otro',
+                  respuesta: this.respuestaOtro,
+              };
+              respuestas.push(respuesta);
+            }
             // Arreglo para almacenar las respuestas
-            const respuestas = [];
 
             // Recorre el arreglo de preguntas y construye el arreglo de respuestas
             this.preguntas.forEach(pregunta => {
@@ -574,7 +641,7 @@
             //console.log(respuestas.length);
 
             // Verifica que haya al menos 2 respuestas y que el campo this.email no esté vacío
-            if (respuestas.length >= 2 && this.email.trim() !== '') {
+            if (respuestas.length >= 1 ) {
                 axios.post('https://evaluacionservicios.usm.cl/survey/api/respuestaLarga', {
                     email: this.email,
                     respuestas: respuestas
@@ -753,7 +820,7 @@
       padding-top: 20px;
       padding-bottom: 10px;
       text-align: center;
-      font-size: 22px;
+      font-size: 24px;
       font-weight: bolder;
       color: #24006A;
       font-family: 'Montserrat', sans-serif;
@@ -768,6 +835,15 @@
       font-family: 'Montserrat', sans-serif;
     }
 
+    .subtitulo3 {
+      padding-bottom: 10px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: bolder;
+      color: #000000;
+      font-family: 'Montserrat', sans-serif;
+    }
+
     
     /* Media query para pantallas más pequeñas (menor o igual a 576px) */
     @media (max-width: 576px) {
@@ -776,7 +852,7 @@
       }
 
       .subtitulo {
-        font-size: 20px; /* Tamaño de fuente más pequeño para pantallas pequeñas */
+        font-size: 24px; /* Tamaño de fuente más pequeño para pantallas pequeñas */
       }
     }
     
@@ -794,7 +870,7 @@
 
     .boton-naranja {
       font-family: 'Montserrat', sans-serif;
-      font-weight: lighter;
+      font-weight: bold;
       background-color: #fff; /* Fondo blanco */
       color: #000; /* Texto negro */
       min-width: 100%;
