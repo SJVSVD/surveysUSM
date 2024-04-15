@@ -647,7 +647,7 @@
                     respuestas: respuestas
                 })
                 .then(response => {
-                    //console.log(response.data);
+                    console.log(response.data);
                     this.pantallaGracias = true;
                     this.encuestaLarga = false;
                 })
@@ -853,6 +853,9 @@
 
       .subtitulo {
         font-size: 24px; /* Tamaño de fuente más pequeño para pantallas pequeñas */
+      }
+      .subtitulo3 {
+        font-size: 20px; /* Tamaño de fuente más pequeño para pantallas pequeñas */
       }
     }
     
