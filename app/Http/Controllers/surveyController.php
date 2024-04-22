@@ -21,7 +21,7 @@ class surveyController extends Controller
           CURLOPT_CUSTOMREQUEST => 'POST',
           CURLOPT_POSTFIELDS => array('totem' => $request->totem,'subunidad' => $request->subunidad,'respuesta' => $request->respuesta),
           CURLOPT_HTTPHEADER => array(
-            'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiQURNSU4iLCJleHAiOjE3MTE4MjE0OTV9.QF0qZ4zoOyQIGxTeave1okFVD1gAY9z85QI4kJLZJi4',
+            //'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoiQURNSU4iLCJleHAiOjE3MTE4MjE0OTV9.QF0qZ4zoOyQIGxTeave1okFVD1gAY9z85QI4kJLZJi4',
             'Cookie: SERVERIDevaluacionservicios=EVAL1'
           ),
         ));

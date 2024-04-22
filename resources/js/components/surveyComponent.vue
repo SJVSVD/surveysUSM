@@ -403,7 +403,7 @@
           })
             .then(response => {
               const token = response.data.token;
-              //console.log('Token recibido:', token);
+              // console.log('Token recibido:', token);
               this.tokenAdmin = token;
               this.getSedes2(this.tokenAdmin);
               // Aquí puedes almacenar o utilizar el token según tus necesidades
@@ -559,6 +559,9 @@
           this.showModal = false;
           if(this.valorSeleccionado < 4){
               this.longSurvey(this.tokenAdmin, this.encuesta.subunidad);
+              this.opcionOtroSeleccionado = false; 
+              this.respuestaOtro = '';
+              this.email = '';
               this.encuestaLarga = true;
           }else{
               this.respuestaCorta(this.tokenAdmin);
@@ -892,6 +895,14 @@
       background-color: #F4C06A; /* Fondo naranja al pasar el mouse o enfocar */
       color: #fff; /* Texto blanco */
     }
+
+    @media (max-width: 768px) {
+      /* Desactivar hover */
+      .boton-naranja:hover {
+          background-color: inherit; /* Mantener el color de fondo original */
+          color: inherit; /* Mantener el color de texto original */
+      }
+  }
 
     .boton-naranja.seleccionado {
       background-color: #F4C06A; /* Estilo para el botón seleccionado */
