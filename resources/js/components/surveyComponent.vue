@@ -558,6 +558,7 @@
 
           this.showModal = false;
           if(this.valorSeleccionado < 4){
+              this.respuestaCorta(this.tokenAdmin);
               this.longSurvey(this.tokenAdmin, this.encuesta.subunidad);
               this.opcionOtroSeleccionado = false; 
               this.respuestaOtro = '';
@@ -606,12 +607,11 @@
             }else if(this.opcionOtroSeleccionado){
               const respuesta = {
                   subunidad_id: this.encuesta.subunidad,
-                  pregunta_id: 'Otro',
-                  respuesta: this.respuestaOtro,
+                  pregunta_id: 32,
+                  respuesta: 'Otro - ' + this.respuestaOtro,
               };
               respuestas.push(respuesta);
             }
-            // Arreglo para almacenar las respuestas
 
             // Recorre el arreglo de preguntas y construye el arreglo de respuestas
             this.preguntas.forEach(pregunta => {
@@ -641,8 +641,7 @@
               }
             });
 
-            //console.log(respuestas.length);
-
+            console.log(respuestas);
             // Verifica que haya al menos 2 respuestas y que el campo this.email no esté vacío
             if (respuestas.length >= 1 ) {
                 axios.post('https://evaluacionservicios.usm.cl/survey/api/respuestaLarga', {
