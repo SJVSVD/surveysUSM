@@ -52,7 +52,7 @@
         </div>
         <button v-if="group != 1" class="boton-azul2" @click="group = group - 1">Volver</button>
         &nbsp;
-        <button v-if="group != 3" class="boton-azul2" @click="group = group + 1">Siguiente</button>
+        <button v-if="(group == 1 && encuesta.campus != '') || (group == 2 && encuesta.unidad != '') " class="boton-azul2" @click="group = group + 1">Siguiente</button>
       </div>
       <div class="row" v-else>
         <!-- Primer grupo -->
