@@ -2,6 +2,10 @@
 <template>
     <div v-if="siguientePaso == false"> 
       <h3 class="titulo">Encuesta de evaluación de calidad</h3>
+      <button class="g-recaptcha" 
+        data-sitekey="reCAPTCHA_site_key" 
+        data-callback='onSubmit' 
+        data-action='submit'>Submit</button>
       <div class="row" v-if="isMobile">
         <!-- Primer grupo -->
         <div class="col-md-4" v-show="group === 1">
@@ -210,7 +214,7 @@
 
 
   </template>
-  
+
   <script>
   import axios from 'axios'
 
@@ -277,6 +281,9 @@
       document.removeEventListener('keydown', this.cerrarModalConEscape);
     },
     methods: {
+        onSubmit(token) {
+          document.getElementById("demo-form").submit();
+        },
         mostrarCampoOtro() {
             // Si la opción "Otro" está seleccionada, se muestra el campo de texto, de lo contrario se oculta
             if (this.opcionOtroSeleccionado) {
@@ -403,7 +410,7 @@
           })
             .then(response => {
               const token = response.data.token;
-              // console.log('Token recibido:', token);
+              console.log('Token recibido:', token);
               this.tokenAdmin = token;
               this.getSedes2(this.tokenAdmin);
               // Aquí puedes almacenar o utilizar el token según tus necesidades
@@ -417,7 +424,7 @@
           axios.post(`https://evaluacionservicios.usm.cl/api/encuesta/login`).then( response =>{
               this.token = response.data.token;
               //this.getSedes(this.token);
-              //console.log(this.token);
+              console.log(this.token);
           }).catch(e=> console.log(e))
         },
         getSedes(token) {
@@ -446,7 +453,7 @@
             headers: headers
           }).then(response => {
             this.sedes = response.data;
-            //console.log(this.sedes);
+            console.log(this.sedes);
           }).catch(error => {
             console.log(error);
           });
@@ -487,7 +494,7 @@
 
             axios.get(url, { headers })
               .then(response => {
-                //console.log(response.data);
+                console.log(response.data);
                 this.subunidades = response.data.sub_unidades;
               })
               .catch(error => {
