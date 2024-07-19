@@ -1,11 +1,8 @@
 <!-- MyComponent.vue -->
+ 
 <template>
     <div v-if="siguientePaso == false"> 
       <h3 class="titulo">Encuesta de evaluación de calidad</h3>
-      <button class="g-recaptcha" 
-        data-sitekey="reCAPTCHA_site_key" 
-        data-callback='onSubmit' 
-        data-action='submit'>Submit</button>
       <div class="row" v-if="isMobile">
         <!-- Primer grupo -->
         <div class="col-md-4" v-show="group === 1">
@@ -109,12 +106,27 @@
       </div>
     <br>
     </div>
+    <div class="modal" v-if="showCaptcha">
+      <div class="modal-contenido">
+        <div class="modal-cuerpo">
+          <br>
+          <div class="contenedor-centralizado pt-5">
+            <div ref="recaptcha" class="recaptcha-container"></div>
+          </div>
+          <br>
+            <div class="p-3">
+              <button class="boton-azul2"  @click="showCaptcha = false;">Volver</button>
+              <button class="boton-azul2 float-end" @click="submitForm">Enviar </button>
+            </div>
+        </div>
+      </div>
+    </div>
     <div class="modal" v-if="showModal" >
       <div class="modal-contenido">
         <div class="modal-cuerpo">
           <div class="row">
             <h2 class="subtitulo2 pt-3">¿Cómo evalúas tu experiencia?</h2>
-            <h1 class="subtitulo3 ">en {{ subUnidadName }}</h1>
+            <h1 v-if="subUnidadName" class="subtitulo3 ">en {{ subUnidadName }}</h1>
             <div class="boton-estrella-container">
               <div
                 class="boton-estrella"
@@ -214,7 +226,6 @@
 
 
   </template>
-
   <script>
   import axios from 'axios'
 
@@ -229,6 +240,8 @@
         subunidad: '',
       },
       email: '',
+      siteKey: '6LdQ9wcqAAAAAPCnB-ngKq2XFLd8SfvwTRfnMZqJ',
+      recaptchaToken: '',
       isMobile: false,
       group: 1,
       errors: [],
@@ -244,6 +257,7 @@
       valorSeleccionado: null, 
       estrellaHover: null,
       showModal: false,
+      showCaptcha: false,
       preguntas: [],
       opcionOtroSeleccionado: false, 
       respuestaOtro: ''
@@ -263,7 +277,8 @@
           //console.log('El ID es:', this.id);
           this.encuesta.subunidad = this.id;
           this.getSubunidadName(this.encuesta.subunidad);
-          this.showModal = true;
+          this.loadRecaptcha();
+          this.showCaptcha = true;
       } else {
           console.log('No se encontró un ID de subunidad válido en la URL.');
       }
@@ -281,8 +296,52 @@
       document.removeEventListener('keydown', this.cerrarModalConEscape);
     },
     methods: {
-        onSubmit(token) {
-          document.getElementById("demo-form").submit();
+        loadRecaptcha() {
+          const script = document.createElement('script');
+          this.recaptchaToken = '';
+          script.src = `https://www.google.com/recaptcha/api.js?render=${this.siteKey}`;
+          script.addEventListener('load', () => {
+            grecaptcha.ready(() => {
+              grecaptcha.render(this.$refs.recaptcha, {
+                sitekey: this.siteKey,
+                callback: (token) => {
+                  this.recaptchaToken = token;
+                },
+              });
+            });
+          });
+          document.head.appendChild(script);
+        },
+        submitForm() {
+          if (!this.recaptchaToken) {
+            this.toast.warning( 'Por favor, completa el CAPTCHA.', {
+                position: "top-right",
+                timeout: 5000,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: true,
+                closeButton: "button",
+                icon: true,
+                rtl: false
+              });
+            return;
+          }
+          this.showCaptcha = false;
+          this.showModal = true;
+          axios.post('/api/submit-form', {
+            // Otros datos del formulario
+            'g-recaptcha-response': this.recaptchaToken,
+          }).then(response => {
+            // Manejar la respuesta del servidor
+            console.log(response.data);
+          }).catch(error => {
+            // Manejar el error en caso de fallo en la solicitud
+            console.error('Error al enviar formulario:', error);
+          });
         },
         mostrarCampoOtro() {
             // Si la opción "Otro" está seleccionada, se muestra el campo de texto, de lo contrario se oculta
@@ -291,11 +350,26 @@
             }
         },
         getSubunidadName(id){
-          axios.get(`https://evaluacionservicios.usm.cl/api/subunidad/nombre/${id}`).then(response => {
-            this.subUnidadName = response.data;
-          }).catch(error => {
-            console.log(error);
-          });
+          // Transforma la id a un entero
+          const subunidadId = parseInt(id, 10);
+
+          // Verifica si la conversión fue exitosa
+          if (isNaN(subunidadId)) {
+            console.log('El ID proporcionado no es un número válido.');
+            return;
+          }
+
+          // Imprime el id convertido
+          console.log(subunidadId);
+
+          // Realiza la solicitud con axios
+          axios.get(`https://evaluacionservicios.usm.cl/api/subunidad/nombre/${subunidadId}`)
+            .then(response => {
+              this.subUnidadName = response.data;
+            })
+            .catch(error => {
+              console.log(error);
+            });
         },
         ordenarPreguntas() {
           // Ordena las preguntas para que las de tipo 'Opciones' aparezcan primero
@@ -357,7 +431,8 @@
             this.group = 3;
           }
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
-            this.showModal = true;
+            this.loadRecaptcha();
+            this.showCaptcha = true;
             this.valorSeleccionado = null;
           }
           this.getSubunidades(this.tokenAdmin);
@@ -366,7 +441,8 @@
           this.encuesta.subunidad = subservicio.id;
           this.subUnidadName = subservicio.name;
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
-            this.showModal = true;
+            this.loadRecaptcha();
+            this.showCaptcha = true;
             this.valorSeleccionado = null;
           }
         },
@@ -381,7 +457,8 @@
             this.group = 2;
           }
           if(this.encuesta.campus && this.encuesta.unidad && this.encuesta.subunidad){
-            this.showModal = true;
+            this.loadRecaptcha();
+            this.showCaptcha = true;
             this.valorSeleccionado = null;
           }
           this.getUnidades(this.tokenAdmin);
