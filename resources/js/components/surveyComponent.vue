@@ -297,37 +297,32 @@
     },
     methods: {
         loadRecaptcha() {
-          const script = document.createElement('script');
-          this.recaptchaToken = '';
-          script.src = `https://www.google.com/recaptcha/api.js?render=${this.siteKey}`;
-          script.addEventListener('load', () => {
             grecaptcha.ready(() => {
-              grecaptcha.render(this.$refs.recaptcha, {
-                sitekey: this.siteKey,
-                callback: (token) => {
-                  this.recaptchaToken = token;
-                },
-              });
+            grecaptcha.render(this.$refs.recaptcha, {
+              'sitekey': this.siteKey,
+              'callback': this.onCaptchaVerified,
             });
           });
-          document.head.appendChild(script);
+        },
+        onCaptchaVerified(token) {
+          this.recaptchaToken = token;
         },
         submitForm() {
           if (!this.recaptchaToken) {
-            this.toast.warning( 'Por favor, completa el CAPTCHA.', {
-                position: "top-right",
-                timeout: 5000,
-                closeOnClick: true,
-                pauseOnFocusLoss: true,
-                pauseOnHover: true,
-                draggable: true,
-                draggablePercent: 0.6,
-                showCloseButtonOnHover: false,
-                hideProgressBar: true,
-                closeButton: "button",
-                icon: true,
-                rtl: false
-              });
+            this.toast.warning('Por favor, completa el CAPTCHA.', {
+              position: "top-right",
+              timeout: 5000,
+              closeOnClick: true,
+              pauseOnFocusLoss: true,
+              pauseOnHover: true,
+              draggable: true,
+              draggablePercent: 0.6,
+              showCloseButtonOnHover: false,
+              hideProgressBar: true,
+              closeButton: "button",
+              icon: true,
+              rtl: false,
+            });
             return;
           }
           this.showCaptcha = false;

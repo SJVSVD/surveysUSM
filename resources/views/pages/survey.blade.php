@@ -1,6 +1,6 @@
 @extends('layouts.main')
 <head>
-    <script src="https://www.google.com/recaptcha/api.js?render=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LdQ9wcqAAAAAPCnB-ngKq2XFLd8SfvwTRfnMZqJ"></script>
 
 </head>
 @section('content')
